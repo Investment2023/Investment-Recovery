@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Investment Recovery Platform</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f4f7fa;
+    color: #222;
+}
+
+/* HEADER */
+header {
+    background: #0a2540;
+    color: white;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+nav a {
+    color: white;
+    margin-left: 15px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* PAGE SYSTEM */
+.page { display: none; }
+.active { display: block; }
+
+/* HERO */
+.hero {
+    min-height: 85vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: linear-gradient(rgba(10,37,64,0.8), rgba(10,37,64,0.8)),
+    url('https://images.unsplash.com/photo-1520607162513-77705c0f0d4a') center/cover;
+    color: white;
+    padding: 20px;
+}
+
+.btn {
+    padding: 14px 28px;
+    background: #00b894;
+    border: none;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* FEATURES */
+.features {
+    padding: 60px 20px;
+    background: white;
+    text-align: center;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    max-width: 1000px;
+    margin: 30px auto 0;
+}
+
+.card {
+    background: #f8f9fc;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+
+/* FORMS */
+.form-box {
+    background: white;
+    padding: 25px;
+    margin: 20px auto;
+    max-width: 600px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+button {
+    margin-top: 15px;
+    width: 100%;
+    padding: 12px;
+    background: #0a2540;
+    color: white;
+    border: none;
+    border-radius: 8px;
+}
+
+/* BALANCE */
+.balance {
+    font-size: 40px;
+    color: #0a2540;
+    margin-top: 10px;
+}
+
+/* NOTIFICATIONS */
+.notification {
+    background: #e8f4ff;
+    border-left: 5px solid #0a2540;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 8px;
+}
+
+/* POPUP */
+.popup {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    justify-content: center;
+    align-items: center;
+}
+
+.popup-box {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+/* FOOTER */
+footer {
+    background: #0a2540;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    margin-top: 50px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>Investment Recovery (PTY)</h1>
+    <nav>
+        <a href="#" onclick="showPage('home')">Home</a>
+        <a href="#" onclick="showPage('login')">Login</a>
+        <a href="#" onclick="showPage('dashboard')">Dashboard</a>
+    </nav>
+</header>
+
+<!-- HOME -->
+<div id="home" class="page active">
+
+    <div class="hero">
+        <div>
+            <h2>Recover Your Investments Securely</h2>
+            <p>Track your investments and manage recovery requests safely.</p>
+            <button class="btn" onclick="showPage('login')">Get Started</button>
+        </div>
+    </div>
+
+    <section class="features">
+        <h3>Why Choose Us?</h3>
+
+        <div class="cards">
+
+            <div class="card">
+                <h4>Secure Recovery</h4>
+                <p>Your financial details are protected with advanced security systems.</p>
+            </div>
+
+            <div class="card">
+                <h4>Fast Withdrawals</h4>
+                <p>Recover your investment profits quickly with smooth approval processes.</p>
+            </div>
+
+            <div class="card">
+                <h4>Trusted Platform</h4>
+                <p>Thousands of investors trust our system for portfolio growth and recovery.</p>
+            </div>
+
+        </div>
+    </section>
+
+</div>
+
+<!-- LOGIN -->
+<div id="login" class="page">
+    <div class="form-box">
+        <h2>Login</h2>
+        <input id="username" placeholder="Username">
+        <input id="password" type="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+    </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="page">
+
+    <div class="form-box">
+        <h2>Account Balance</h2>
+        <div class="balance">R <span id="balance">0</span></div>
+    </div>
+
+    <div class="form-box">
+        <h3>Individual Information</h3>
+        <p>First Name: Frederick </p>
+        <p>Last Name: Pretorius </p>
+        <p>ID Number: 4802035100085 </p>
+    </div>
+
+    <div class="form-box">
+        <h3>Notifications</h3>
+        <div id="notifications"></div>
+    </div>
+
+    <!-- WITHDRAW SECTION (UPDATED ONLY HERE) -->
+    <div class="form-box">
+        <h3>Withdraw</h3>
+
+        <input placeholder="Amount">
+
+        <h4>Banking Details</h4>
+
+        <input placeholder="Account Holder Name">
+        <input placeholder="Bank Name">
+        <input placeholder="Account Number">
+        <input placeholder="Branch Code">
+
+        <button onclick="showPopup()">Submit</button>
+    </div>
+
+</div>
+
+<!-- POPUP -->
+<div class="popup" id="popup">
+    <div class="popup-box">
+        <h3>Withdrawal Pending</h3>
+         <p>Your withdrawal request has been submitted successfully.</p>
+        <p>Proceed to Making EFT To</p>
+
+        <p>Account Holder: Investment Savings</p>
+        <p>Bank Name: TymeBank</p>
+        <p>Branch Code: 678910</p>
+        <p>Account Number: 53003613214</p>
+
+        <p>For Reference Use ID Number</p>
+
+        <p><strong>Status:</strong> Awaiting Approval</p>
+        <p>Please wait while our team reviews your request.</p>
+        
+        <button onclick="closePopup()">Close</button>
+    </div>
+</div>
+
+<footer>
+    © 2026 Investment Recovery Platform | All Rights Reserved
+</footer>
+
+<script>
+
+let balanceTimer;
+
+/* PAGE SWITCH */
+function showPage(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(page).classList.add('active');
+
+    if(page === "dashboard") {
+        startDashboard();
+    } else {
+        stopDashboard();
+    }
+}
+
+/* LOGIN */
+function login() {
+    let u = document.getElementById("username").value;
+    let p = document.getElementById("password").value;
+
+    if(u === "Pretorius48" && p === "4802035100085") {
+        showPage("dashboard");
+    } else {
+        alert("Incorrect login");
+    }
+}
+
+/* DASHBOARD */
+function startDashboard() {
+    document.getElementById("balance").innerText = "0";
+    document.getElementById("notifications").innerHTML = "";
+
+    animateBalance(378500);
+    startNotifications();
+}
+
+function stopDashboard() {
+    clearInterval(balanceTimer);
+}
+
+/* BALANCE */
+function animateBalance(target) {
+    let current = 0;
+    let step = target / 80;
+
+    balanceTimer = setInterval(() => {
+        current += step;
+
+        if(current >= target) {
+            current = target;
+            clearInterval(balanceTimer);
+        }
+
+        document.getElementById("balance").innerText =
+        Math.floor(current).toLocaleString();
+    }, 25);
+}
+
+/* NOTIFICATIONS */
+function addNotification(msg) {
+    let box = document.getElementById("notifications");
+    let div = document.createElement("div");
+    div.className = "notification";
+    div.innerText = msg;
+    box.prepend(div);
+}
+
+function startNotifications() {
+    setTimeout(() => addNotification("Deposit Pending: R2,000"), 1500);
+    setTimeout(() => addNotification("System review running"), 4000);
+    setTimeout(() => addNotification("Account verified"), 7000);
+    setTimeout(() => addNotification("Withdrawal queued"), 10000);
+}
+
+/* POPUP */
+function showPopup() {
+    document.getElementById("popup").style.display = "flex";
+}
+
+function closePopup() {
+    document.getElementById("popup").style.display = "none";
+}
+
+</script>
+
+</body>
+</html>
