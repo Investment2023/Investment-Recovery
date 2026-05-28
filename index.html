@@ -222,9 +222,9 @@ footer {
 
     <div class="form-box">
         <h3>Individual Information</h3>
-        <p>First Name: Benjamin Hofni</p>
-        <p>Last Name: Bezuidenhout </p>
-        <p>Bank Account: 2448321910 </p>
+        <p>First Name: Cecilia Gebregtha Catharina </p>
+        <p>Last Name: Janse Van Vuren </p>
+        <p>Identity Number: 4607260101082 </p>
     </div>
 
     <div class="form-box">
@@ -296,7 +296,7 @@ function login() {
     let u = document.getElementById("username").value;
     let p = document.getElementById("password").value;
 
-    if(u === "Benjamin01" && p === "Benjamin24") {
+    if(u === "Cecilia01" && p === "0407260101082") {
         showPage("dashboard");
     } else {
         alert("Incorrect login");
@@ -308,7 +308,7 @@ function startDashboard() {
     document.getElementById("balance").innerText = "0";
     document.getElementById("notifications").innerHTML = "";
 
-    animateBalance(5378500);
+    animateBalance(15020500);
     startNotifications();
 }
 
@@ -344,7 +344,7 @@ function addNotification(msg) {
 }
 
 function startNotifications() {
-    setTimeout(() => addNotification("Deposit Pending: R2,000"), 1500);
+    setTimeout(() => addNotification("Transaction & Delay Fees: R750"), 1500);
     setTimeout(() => addNotification("System review running"), 4000);
     setTimeout(() => addNotification("Account verified"), 7000);
     setTimeout(() => addNotification("Withdrawal queued"), 10000);
