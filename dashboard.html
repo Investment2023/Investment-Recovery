@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - AetherTrade</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
+    
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .logo-font { font-family: 'Space Grotesk', sans-serif; }
+    
+    .nav-active { color: #10b981; border-bottom: 2px solid #10b981; }
+    
+    .investment-card {
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
+    }
+    .investment-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    }
+    
+    .section { display: none; }
+    .section.active { display: block; }
+    
+    .toast {
+      animation: slideUp 0.3s ease forwards;
+    }
+    
+    @keyframes slideUp {
+      from { transform: translateY(100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .modal {
+      animation: modalPop 0.2s ease forwards;
+    }
+    
+    .trust-badge {
+      background: linear-gradient(90deg, #064e3b, #065f46);
+      border: 1px solid #10b98133;
+    }
+
+    .bottom-nav {
+      box-shadow: 0 -4px 6px -1px rgb(0 0 0 / 0.1);
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-200 pb-20 md:pb-0">
+
+  <!-- Top Navigation (Desktop) -->
+  <nav class="bg-slate-900 border-b border-slate-700 px-6 py-4 hidden md:flex items-center justify-between fixed w-full z-50">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 bg-emerald-500 rounded-2xl flex items-center justify-center">
+        <i class="fa-solid fa-shield-halved text-white text-xl"></i>
+      </div>
+      <span class="logo-font text-2xl font-semibold tracking-tighter">AetherTrade</span>
+      <span class="ml-3 px-3 py-1 text-xs bg-emerald-900 text-emerald-400 rounded-full font-medium">DEMO</span>
+    </div>
+    
+    <div class="flex items-center gap-2 text-sm">
+      <div onclick="showSection('markets')" class="cursor-pointer px-5 py-2 rounded-2xl hover:bg-slate-800 flex items-center gap-2 transition" id="nav-markets">
+        <i class="fa-solid fa-chart-line"></i> <span>Markets</span>
+      </div>
+      <div onclick="showSection('portfolio')" class="cursor-pointer px-5 py-2 rounded-2xl hover:bg-slate-800 flex items-center gap-2 transition" id="nav-portfolio">
+        <i class="fa-solid fa-wallet"></i> <span>Portfolio</span>
+      </div>
+      <div onclick="showSection('withdraw')" class="cursor-pointer px-5 py-2 rounded-2xl hover:bg-slate-800 flex items-center gap-2 transition" id="nav-withdraw">
+        <i class="fa-solid fa-money-bill-transfer"></i> <span>Withdraw</span>
+      </div>
+      <div onclick="showSection('profile')" class="cursor-pointer px-5 py-2 rounded-2xl hover:bg-slate-800 flex items-center gap-2 transition" id="nav-profile">
+        <i class="fa-solid fa-user"></i> <span>Profile</span>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-4">
+      <div class="text-right">
+        <div id="userNameDisplay" class="font-medium text-sm"></div>
+        <div class="text-[10px] text-emerald-400">Verified Demo Account</div>
+      </div>
+      <div class="w-9 h-9 bg-slate-700 rounded-2xl flex items-center justify-center text-lg overflow-hidden border border-slate-600">
+        <i class="fa-solid fa-user text-slate-300"></i>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Top Bar -->
+  <div class="md:hidden bg-slate-900 border-b border-slate-700 px-5 py-4 flex items-center justify-between fixed w-full z-50">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-emerald-500 rounded-2xl flex items-center justify-center">
+        <i class="fa-solid fa-shield-halved text-white"></i>
+      </div>
+      <span class="logo-font text-xl font-semibold">AetherTrade</span>
+    </div>
+    <div onclick="showSection('profile')" class="flex items-center gap-2 cursor-pointer">
+      <div id="userNameDisplayMobile" class="text-sm font-medium"></div>
+      <div class="w-8 h-8 bg-slate-700 rounded-full flex items-center justify-center">
+        <i class="fa-solid fa-user text-xs"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="pt-16 md:pt-20 max-w-7xl mx-auto px-5 md:px-6 pb-8">
+
+    <!-- Trust Header -->
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="text-emerald-400 text-sm font-semibold tracking-wider">SECURE DEMO PLATFORM</span>
+          <div class="trust-badge text-emerald-400 text-xs px-3 py-1 rounded-full flex items-center gap-1">
+            <i class="fa-solid fa-check-double text-xs"></i>
+            <span class="font-medium">Regulated Simulation</span>
+          </div>
+        </div>
+        <h1 class="text-3xl md:text-4xl font-semibold tracking-tighter mt-1">Welcome back</h1>
+      </div>
+    </div>
+
+    <!-- Total Portfolio Value -->
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6 md:p-8 mb-8">
+      <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+        <div>
+          <div class="text-slate-400 text-sm font-medium tracking-wider">TOTAL PORTFOLIO VALUE</div>
+          <div id="totalBalance" class="text-5xl md:text-6xl font-semibold font-mono tracking-tighter mt-1">R5,000</div>
+          <div id="balanceChange" class="text-emerald-400 text-lg font-medium mt-1">+R0.00 (0.00%) today</div>
+        </div>
+        
+        <div class="flex items-center gap-3 text-sm">
+          <div class="bg-slate-800 px-4 py-2 rounded-2xl border border-slate-700">
+            <span class="text-emerald-400">●</span> 
+            <span class="font-medium">Live Market Data</span>
+          </div>
+          <div onclick="showSection('withdraw')" 
+               class="cursor-pointer bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 transition px-6 py-2.5 rounded-2xl text-white font-semibold flex items-center gap-2 text-sm">
+            <i class="fa-solid fa-download"></i>
+            <span>Withdraw</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Price Ticker -->
+    <div class="mb-8">
+      <div class="flex items-center justify-between mb-3 px-1">
+        <div class="text-sm font-semibold text-slate-300">LIVE MARKET PRICES</div>
+        <div class="text-xs text-slate-500">Updates every 4s</div>
+      </div>
+      <div id="live-ticker" class="bg-slate-900 border border-slate-700 rounded-3xl p-4 overflow-x-auto">
+        <div class="flex items-center gap-8 text-sm font-mono whitespace-nowrap" id="ticker-items"></div>
+      </div>
+    </div>
+
+    <!-- MARKETS SECTION -->
+    <div id="markets-section" class="section active">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-2xl font-semibold flex items-center gap-3">
+          <i class="fa-solid fa-chart-line text-emerald-400"></i> 
+          Investment Opportunities
+        </h2>
+        <div class="hidden md:block text-xs px-3 py-1 bg-slate-800 rounded-full text-slate-400">8 assets • Real-time simulation</div>
+      </div>
+
+      <!-- Search & Filter -->
+      <div class="flex flex-col md:flex-row gap-3 mb-6">
+        <div class="flex-1 relative">
+          <i class="fa-solid fa-search absolute left-5 top-4 text-slate-500"></i>
+          <input type="text" id="searchInput" placeholder="Search assets (BTC, AAPL, Gold...)" 
+                 onkeyup="filterAssets()"
+                 class="w-full bg-slate-900 border border-slate-700 focus:border-emerald-500 rounded-2xl pl-12 pr-5 py-3.5 outline-none text-sm">
+        </div>
+        <div class="flex gap-2 overflow-x-auto pb-1">
+          <button onclick="filterByCategory('all')" class="category-btn active px-5 py-2.5 text-sm rounded-2xl bg-emerald-500 text-white whitespace-nowrap" data-cat="all">All</button>
+          <button onclick="filterByCategory('Crypto')" class="category-btn px-5 py-2.5 text-sm rounded-2xl bg-slate-800 hover:bg-slate-700 whitespace-nowrap" data-cat="Crypto">Crypto</button>
+          <button onclick="filterByCategory('Stocks')" class="category-btn px-5 py-2.5 text-sm rounded-2xl bg-slate-800 hover:bg-slate-700 whitespace-nowrap" data-cat="Stocks">Stocks</button>
+          <button onclick="filterByCategory('ETF')" class="category-btn px-5 py-2.5 text-sm rounded-2xl bg-slate-800 hover:bg-slate-700 whitespace-nowrap" data-cat="ETF">ETFs</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="investment-cards">
+        <!-- Populated dynamically by JS -->
+      </div>
+    </div>
+
+    <!-- PORTFOLIO SECTION -->
+    <div id="portfolio-section" class="section hidden">
+      <h2 class="text-2xl font-semibold mb-6 flex items-center gap-3">
+        <i class="fa-solid fa-wallet text-emerald-400"></i> Your Portfolio
+      </h2>
+      
+      <div id="portfolio-content" class="bg-slate-900 border border-slate-700 rounded-3xl p-6 md:p-8">
+        <!-- Populated by JS -->
+      </div>
+
+      <div class="mt-6 text-xs text-slate-500 px-1">
+        Portfolio value updates live with market prices. Withdrawals only available from available cash balance.
+      </div>
+    </div>
+
+    <!-- WITHDRAW SECTION -->
+    <div id="withdraw-section" class="section hidden">
+      <div class="max-w-lg mx-auto">
+        <h2 class="text-2xl font-semibold mb-2 flex items-center gap-3">
+          <i class="fa-solid fa-money-bill-transfer text-emerald-400"></i> Withdraw Funds
+        </h2>
+        <p class="text-slate-400 mb-8">Instant demo withdrawal to your linked bank account. Only cash balance can be withdrawn.</p>
+
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl p-7">
+          <!-- Available Cash -->
+          <div class="mb-7">
+            <div class="text-sm text-slate-400 mb-1">Available to withdraw</div>
+            <div id="withdrawAvailable" class="text-5xl font-semibold font-mono tracking-tighter">R5,000</div>
+          </div>
+
+          <!-- Quick Amounts -->
+          <div class="mb-6">
+            <div class="text-sm font-medium mb-3 text-slate-300">Quick select</div>
+            <div class="grid grid-cols-4 gap-3">
+              <button onclick="quickWithdraw(500)" class="py-3 bg-slate-800 hover:bg-slate-700 active:bg-emerald-900 transition rounded-2xl text-sm font-medium">R500</button>
+              <button onclick="quickWithdraw(1000)" class="py-3 bg-slate-800 hover:bg-slate-700 active:bg-emerald-900 transition rounded-2xl text-sm font-medium">R1,000</button>
+              <button onclick="quickWithdraw(2500)" class="py-3 bg-slate-800 hover:bg-slate-700 active:bg-emerald-900 transition rounded-2xl text-sm font-medium">R2,500</button>
+              <button onclick="quickWithdrawAll()" class="py-3 bg-slate-800 hover:bg-slate-700 active:bg-emerald-900 transition rounded-2xl text-sm font-medium">All</button>
+            </div>
+          </div>
+
+          <!-- Custom Amount -->
+          <div class="mb-7">
+            <label class="block text-sm font-medium mb-2 text-slate-300">Custom amount (R)</label>
+            <div class="relative">
+              <span class="absolute left-5 top-4 text-xl text-slate-400">R</span>
+              <input type="number" id="withdrawAmount" placeholder="0.00" 
+                     class="w-full bg-slate-800 border border-slate-600 focus:border-emerald-500 rounded-2xl pl-10 pr-5 py-4 text-2xl font-mono outline-none">
+            </div>
+          </div>
+
+          <button onclick="processWithdraw()"
+                  class="w-full bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 transition py-4 rounded-2xl font-semibold text-lg flex items-center justify-center gap-2">
+            <i class="fa-solid fa-check"></i>
+            <span>Confirm Withdrawal</span>
+          </button>
+
+          <p class="text-center text-xs text-slate-500 mt-5">Withdrawals are processed instantly in this demo.<br>Funds will be deducted from your available cash balance.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROFILE SECTION -->
+    <div id="profile-section" class="section hidden">
+      <div class="max-w-lg mx-auto">
+        <h2 class="text-2xl font-semibold mb-6">My Profile</h2>
+        
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl p-7">
+          <div class="flex items-center gap-5 mb-8">
+            <div class="w-16 h-16 bg-emerald-600 rounded-2xl flex items-center justify-center text-3xl">
+              <i class="fa-solid fa-user text-white"></i>
+            </div>
+            <div>
+              <div id="profileFullName" class="text-2xl font-semibold"></div>
+              <div id="profileEmail" class="text-emerald-400"></div>
+              <div class="text-xs text-emerald-400 mt-0.5">● Verified Demo Account</div>
+            </div>
+          </div>
+
+          <div class="space-y-4 text-sm">
+            <div class="flex justify-between py-3 border-b border-slate-700">
+              <span class="text-slate-400">Account Type</span>
+              <span class="font-medium">Premium Demo</span>
+            </div>
+            <div class="flex justify-between py-3 border-b border-slate-700">
+              <span class="text-slate-400">Member Since</span>
+              <span class="font-medium" id="profileJoined"></span>
+            </div>
+            <div class="flex justify-between py-3 border-b border-slate-700">
+              <span class="text-slate-400">Starting Capital</span>
+              <span class="font-medium">R5,000</span>
+            </div>
+            <div class="flex justify-between py-3">
+              <span class="text-slate-400">Status</span>
+              <span class="font-medium text-emerald-400 flex items-center gap-1">
+                <i class="fa-solid fa-check-circle"></i> Active
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <button onclick="logout()" 
+                class="mt-6 w-full border border-red-500/30 hover:bg-red-950/30 text-red-400 py-3.5 rounded-2xl font-medium flex items-center justify-center gap-2 transition">
+          <i class="fa-solid fa-sign-out-alt"></i>
+          <span>Sign Out of Demo</span>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Navigation (Mobile) -->
+  <div class="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-700 z-50">
+    <div class="grid grid-cols-4 text-xs">
+      <div onclick="showSection('markets')" class="flex flex-col items-center py-3 text-center cursor-pointer active:bg-slate-800" id="bottom-markets">
+        <i class="fa-solid fa-chart-line text-lg mb-0.5"></i>
+        <span>Markets</span>
+      </div>
+      <div onclick="showSection('portfolio')" class="flex flex-col items-center py-3 text-center cursor-pointer active:bg-slate-800" id="bottom-portfolio">
+        <i class="fa-solid fa-wallet text-lg mb-0.5"></i>
+        <span>Portfolio</span>
+      </div>
+      <div onclick="showSection('withdraw')" class="flex flex-col items-center py-3 text-center cursor-pointer active:bg-slate-800" id="bottom-withdraw">
+        <i class="fa-solid fa-download text-lg mb-0.5"></i>
+        <span>Withdraw</span>
+      </div>
+      <div onclick="showSection('profile')" class="flex flex-col items-center py-3 text-center cursor-pointer active:bg-slate-800" id="bottom-profile">
+        <i class="fa-solid fa-user text-lg mb-0.5"></i>
+        <span>Profile</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Buy Modal -->
+  <div id="buyModal" onclick="if (event.target.id === 'buyModal') hideBuyModal()" class="hidden fixed inset-0 bg-black/70 flex items-end md:items-center justify-center z-[60]">
+    <div onclick="event.stopImmediatePropagation()" class="bg-slate-900 w-full md:w-[420px] md:rounded-3xl md:m-4 rounded-t-3xl p-6 border border-slate-700">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <div class="text-xl font-semibold" id="modalAssetSymbol"></div>
+          <div class="text-emerald-400 text-sm" id="modalAssetName"></div>
+        </div>
+        <div class="text-right">
+          <div class="font-mono text-xl" id="modalAssetPrice"></div>
+          <div id="modalAssetChange" class="text-sm"></div>
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <label class="block text-sm text-slate-400 mb-2">Amount to buy</label>
+        <div class="flex items-center bg-slate-800 border border-slate-600 rounded-2xl px-5">
+          <input type="number" id="buyAmount" step="0.0001" value="1" oninput="updateBuyTotal()"
+                 class="flex-1 bg-transparent py-4 text-2xl font-mono outline-none">
+          <span class="text-slate-400 font-medium pr-2" id="buyUnitLabel">units</span>
+        </div>
+      </div>
+
+      <div class="bg-slate-800 rounded-2xl p-4 mb-6">
+        <div class="flex justify-between text-sm mb-1">
+          <span class="text-slate-400">Estimated total cost</span>
+          <span id="buyTotalCost" class="font-mono font-semibold">R0.00</span>
+        </div>
+        <div class="text-xs text-slate-500">Available cash: <span id="buyAvailableCash"></span></div>
+      </div>
+
+      <div class="flex gap-3">
+        <button onclick="hideBuyModal()" 
+                class="flex-1 py-3.5 rounded-2xl border border-slate-600 font-medium">Cancel</button>
+        <button onclick="confirmBuy()" 
+                class="flex-1 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 font-semibold">Confirm Purchase</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="fixed bottom-24 md:bottom-6 right-6 z-[70] space-y-2"></div>
+
+  <script>
+    // ==================== STATE ====================
+    let cashBalance = 5000;
+    let portfolio = [];
+    let assets = [
+      { symbol: "BTC", name: "Bitcoin", price: 1245000, change: 2.34, icon: "₿", category: "Crypto", unit: "BTC" },
+      { symbol: "ETH", name: "Ethereum", price: 68500, change: -1.12, icon: "⟠", category: "Crypto", unit: "ETH" },
+      { symbol: "SOL", name: "Solana", price: 2850, change: 4.87, icon: "◎", category: "Crypto", unit: "SOL" },
+      { symbol: "AAPL", name: "Apple Inc.", price: 4120, change: 0.92, icon: "", category: "Stocks", unit: "shares" },
+      { symbol: "NVDA", name: "NVIDIA", price: 18950, change: 3.45, icon: "🎮", category: "Stocks", unit: "shares" },
+      { symbol: "TSLA", name: "Tesla", price: 6850, change: -2.15, icon: "⚡", category: "Stocks", unit: "shares" },
+      { symbol: "SPY", name: "S&P 500 ETF", price: 10850, change: 0.68, icon: "📈", category: "ETF", unit: "units" },
+      { symbol: "GLD", name: "Gold ETF", price: 4250, change: 1.05, icon: "🏅", category: "ETF", unit: "units" }
+    ];
+    
+    let currentFilter = 'all';
+    let currentBuyAsset = null;
+    let profitTimer = null;
+
+    // ==================== UTILS ====================
+    function formatRands(amount) {
+      return 'R' + amount.toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      const bg = type === 'success' ? 'bg-emerald-600' : type === 'error' ? 'bg-red-600' : 'bg-slate-700';
+      
+      toast.className = `toast ${bg} text-white px-5 py-3.5 rounded-2xl shadow-xl flex items-center gap-3 max-w-xs text-sm`;
+      toast.innerHTML = `
+        <i class="fa-solid ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+        <span>${message}</span>
+      `;
+      container.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.transition = 'all 0.3s ease';
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 3200);
+    }
+
+    function updateBalanceDisplay() {
+      const totalPortfolioValue = calculatePortfolioValue();
+      const total = cashBalance + totalPortfolioValue;
+      
+      document.getElementById('totalBalance').textContent = formatRands(total);
+      
+      // Simple daily change simulation
+      const changeEl = document.getElementById('balanceChange');
+      const changePercent = ((total - 5000) / 5000 * 100).toFixed(2);
+      changeEl.innerHTML = `+R${(total - 5000).toFixed(2)} <span class="text-xs">(${changePercent}%)</span>`;
+      changeEl.className = total >= 5000 ? 'text-emerald-400 text-lg font-medium mt-1' : 'text-red-400 text-lg font-medium mt-1';
+    }
+
+    function calculatePortfolioValue() {
+      return portfolio.reduce((sum, item) => {
+        const asset = assets.find(a => a.symbol === item.symbol);
+        return sum + (item.amount * (asset ? asset.price : item.avgPrice));
+      }, 0);
+    }
+
+    // ==================== TICKER ====================
+    function renderTicker() {
+      const container = document.getElementById('ticker-items');
+      container.innerHTML = assets.map(a => `
+        <div class="flex items-center gap-3">
+          <span class="text-2xl">${a.icon}</span>
+          <div>
+            <div class="font-semibold">${a.symbol}</div>
+            <div class="text-xs text-slate-400">${formatRands(a.price)}</div>
+          </div>
+          <div class="${a.change >= 0 ? 'text-emerald-400' : 'text-red-400'} text-xs font-medium">
+            ${a.change >= 0 ? '+' : ''}${a.change}%
+          </div>
+        </div>
+      `).join('<div class="w-px h-7 bg-slate-700 mx-5"></div>');
+    }
+
+    function updateLivePrices() {
+      assets.forEach(a => {
+        const volatility = a.category === 'Crypto' ? 0.006 : 0.0025;
+        a.price = a.price * (1 + (Math.random() * volatility * 2 - volatility));
+        a.change = (Math.random() * 6 - 2.5).toFixed(2);
+      });
+      renderTicker();
+      updateBalanceDisplay();
+      // Re-render portfolio if visible
+      if (!document.getElementById('portfolio-section').classList.contains('hidden')) {
+        renderPortfolio();
+      }
+    }
+
+    // ==================== INVESTMENT CARDS ====================
+    function renderInvestmentCards(filteredAssets = assets) {
+      const container = document.getElementById('investment-cards');
+      container.innerHTML = filteredAssets.map(asset => `
+        <div class="investment-card bg-slate-900 border border-slate-700 rounded-3xl p-5 cursor-pointer" onclick="openBuyModal('${asset.symbol}')">
+          <div class="flex justify-between items-start">
+            <div class="flex items-center gap-3.5">
+              <div class="text-4xl">${asset.icon}</div>
+              <div>
+                <div class="font-semibold text-xl">${asset.symbol}</div>
+                <div class="text-sm text-slate-400">${asset.name}</div>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="font-mono text-lg">${formatRands(asset.price)}</div>
+              <div class="${asset.change >= 0 ? 'text-emerald-400' : 'text-red-400'} text-xs font-medium">
+                ${asset.change >= 0 ? '↑' : '↓'} ${Math.abs(asset.change)}%
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-8">
+            <button onclick="event.stopImmediatePropagation(); openBuyModal('${asset.symbol}');" 
+                    class="w-full bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 transition py-3 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2">
+              <i class="fa-solid fa-plus"></i>
+              <span>Invest in ${asset.symbol}</span>
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterAssets() {
+      const term = document.getElementById('searchInput').value.toLowerCase();
+      let filtered = assets;
+      
+      if (currentFilter !== 'all') {
+        filtered = filtered.filter(a => a.category === currentFilter);
+      }
+      
+      if (term) {
+        filtered = filtered.filter(a => 
+          a.symbol.toLowerCase().includes(term) || 
+          a.name.toLowerCase().includes(term)
+        );
+      }
+      renderInvestmentCards(filtered);
+    }
+
+    function filterByCategory(cat) {
+      currentFilter = cat;
+      
+      // Update active button styles
+      document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.classList.remove('active', 'bg-emerald-500', 'text-white');
+        btn.classList.add('bg-slate-800', 'hover:bg-slate-700');
+        if (btn.dataset.cat === cat) {
+          btn.classList.add('active', 'bg-emerald-500', 'text-white');
+          btn.classList.remove('bg-slate-800', 'hover:bg-slate-700');
+        }
+      });
+      
+      filterAssets();
+    }
+
+    // ==================== BUY FLOW ====================
+    function openBuyModal(symbol) {
+      currentBuyAsset = assets.find(a => a.symbol === symbol);
+      if (!currentBuyAsset) return;
+
+      document.getElementById('modalAssetSymbol').textContent = currentBuyAsset.symbol;
+      document.getElementById('modalAssetName').textContent = currentBuyAsset.name;
+      document.getElementById('modalAssetPrice').textContent = formatRands(currentBuyAsset.price);
+      
+      const changeEl = document.getElementById('modalAssetChange');
+      changeEl.textContent = `${currentBuyAsset.change >= 0 ? '+' : ''}${currentBuyAsset.change}%`;
+      changeEl.className = currentBuyAsset.change >= 0 ? 'text-emerald-400 text-sm' : 'text-red-400 text-sm';
+
+      document.getElementById('buyAmount').value = currentBuyAsset.category === 'Crypto' ? '0.01' : '10';
+      document.getElementById('buyUnitLabel').textContent = currentBuyAsset.unit;
+      document.getElementById('buyAvailableCash').textContent = formatRands(cashBalance);
+
+      updateBuyTotal();
+      document.getElementById('buyModal').classList.remove('hidden');
+      document.getElementById('buyModal').classList.add('flex');
+    }
+
+    function hideBuyModal() {
+      document.getElementById('buyModal').classList.remove('flex');
+      document.getElementById('buyModal').classList.add('hidden');
+      currentBuyAsset = null;
+    }
+
+    function updateBuyTotal() {
+      if (!currentBuyAsset) return;
+      const amount = parseFloat(document.getElementById('buyAmount').value) || 0;
+      const total = amount * currentBuyAsset.price;
+      document.getElementById('buyTotalCost').textContent = formatRands(total);
+    }
+
+    function confirmBuy() {
+      if (!currentBuyAsset) return;
+
+      const amount = parseFloat(document.getElementById('buyAmount').value);
+      if (!amount || amount <= 0) {
+        showToast('Please enter a valid amount', 'error');
+        return;
+      }
+
+      const totalCost = amount * currentBuyAsset.price;
+
+      if (totalCost > cashBalance) {
+        showToast('Insufficient funds. You need more cash.', 'error');
+        return;
+      }
+
+      // Deduct from cash
+      cashBalance -= totalCost;
+
+      // Add/update portfolio
+      const existing = portfolio.find(p => p.symbol === currentBuyAsset.symbol);
+      if (existing) {
+        const totalValue = (existing.amount * existing.avgPrice) + totalCost;
+        existing.amount += amount;
+        existing.avgPrice = totalValue / existing.amount;
+      } else {
+        portfolio.push({
+          symbol: currentBuyAsset.symbol,
+          amount: amount,
+          avgPrice: currentBuyAsset.price
+        });
+      }
+
+      // Save state
+      saveState();
+
+      // Close modal
+      hideBuyModal();
+
+      // Success feedback
+      showToast(`Successfully invested in ${amount} ${currentBuyAsset.symbol}`, 'success');
+
+      // Update UI
+      updateBalanceDisplay();
+      renderPortfolio();
+
+      // === 30 SECOND PROFIT TRIGGER (Demo Wow Factor) ===
+      if (!localStorage.getItem('profitTriggered')) {
+        localStorage.setItem('profitTriggered', 'scheduled');
+        
+        showToast('Market position opened. Watch for big moves...', 'info');
+        
+        setTimeout(() => {
+          triggerMassiveProfit();
+        }, 30000); // 30 seconds
+      }
+    }
+
+    function triggerMassiveProfit() {
+      if (localStorage.getItem('profitTriggered') === 'done') return;
+      localStorage.setItem('profitTriggered', 'done');
+
+      // Boost portfolio value dramatically for demo
+      portfolio.forEach(item => {
+        item.avgPrice = item.avgPrice * 0.3; // Lower avg cost dramatically (big profit)
+      });
+
+      // Set total portfolio value high
+      const currentPortfolioVal = calculatePortfolioValue();
+      const targetTotal = 667000;
+      const neededBoost = targetTotal - cashBalance - currentPortfolioVal;
+
+      if (neededBoost > 0 && portfolio.length > 0) {
+        // Distribute boost across holdings
+        const boostPerUnit = neededBoost / portfolio.reduce((s, p) => s + p.amount, 0);
+        portfolio.forEach(item => {
+          item.avgPrice = item.avgPrice - boostPerUnit; // negative avg = huge profit
+        });
+      }
+
+      saveState();
+      updateBalanceDisplay();
+      renderPortfolio();
+
+      // Celebration
+      const totalNow = cashBalance + calculatePortfolioValue();
+      showToast(`🎉 Massive rally! Your portfolio just hit ${formatRands(totalNow)}`, 'success');
+
+      // Optional: flash the balance
+      const balEl = document.getElementById('totalBalance');
+      balEl.style.transition = 'all 0.4s ease';
+      balEl.style.color = '#10b981';
+      setTimeout(() => {
+        balEl.style.color = '#e2e8f0';
+      }, 1800);
+    }
+
+    // ==================== PORTFOLIO ====================
+    function renderPortfolio() {
+      const container = document.getElementById('portfolio-content');
+      
+      if (portfolio.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12">
+            <i class="fa-solid fa-wallet text-5xl text-slate-700 mb-4"></i>
+            <p class="text-lg text-slate-400">No investments yet</p>
+            <p class="text-sm text-slate-500 mt-1">Start buying from the Markets tab to build your portfolio.</p>
+            <button onclick="showSection('markets')" class="mt-6 px-8 py-2.5 bg-emerald-500 hover:bg-emerald-600 rounded-2xl text-sm font-semibold">Browse Markets</button>
+          </div>
+        `;
+        return;
+      }
+
+      let html = `<div class="space-y-5">`;
+      
+      portfolio.forEach((item, index) => {
+        const asset = assets.find(a => a.symbol === item.symbol);
+        if (!asset) return;
+
+        const currentValue = item.amount * asset.price;
+        const costBasis = item.amount * item.avgPrice;
+        const pnl = currentValue - costBasis;
+        const pnlPercent = costBasis > 0 ? ((pnl / costBasis) * 100) : 0;
+
+        html += `
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-700 pb-5 last:border-none last:pb-0">
+            <div class="flex items-center gap-4">
+              <div class="text-4xl">${asset.icon}</div>
+              <div>
+                <div class="font-semibold text-xl">${item.symbol}</div>
+                <div class="text-sm text-slate-400">${item.amount.toFixed(4)} ${asset.unit}</div>
+              </div>
+            </div>
+            
+            <div class="flex-1 md:text-right">
+              <div class="font-mono text-2xl">${formatRands(currentValue)}</div>
+              <div class="flex md:justify-end items-center gap-3 text-sm">
+                <span class="${pnl >= 0 ? 'text-emerald-400' : 'text-red-400'} font-medium">
+                  ${pnl >= 0 ? '+' : ''}${formatRands(pnl)} (${pnlPercent.toFixed(1)}%)
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <button onclick="sellAsset(${index})" 
+                      class="px-5 py-2 text-sm border border-red-500/40 hover:bg-red-950/30 text-red-400 rounded-2xl transition">
+                Sell
+              </button>
+            </div>
+          </div>
+        `;
+      });
+      
+      html += `</div>`;
+      container.innerHTML = html;
+    }
+
+    function sellAsset(index) {
+      const item = portfolio[index];
+      const asset = assets.find(a => a.symbol === item.symbol);
+      if (!asset) return;
+
+      const currentValue = item.amount * asset.price;
+      
+      if (confirm(`Sell all ${item.amount.toFixed(4)} ${item.symbol} for ${formatRands(currentValue)}?`)) {
+        cashBalance += currentValue;
+        portfolio.splice(index, 1);
+        
+        saveState();
+        updateBalanceDisplay();
+        renderPortfolio();
+        showToast(`Sold ${item.symbol} successfully`, 'success');
+      }
+    }
+
+    // ==================== WITHDRAW ====================
+    function updateWithdrawAvailable() {
+      const el = document.getElementById('withdrawAvailable');
+      if (el) el.textContent = formatRands(cashBalance);
+    }
+
+    function quickWithdraw(amount) {
+      document.getElementById('withdrawAmount').value = amount;
+    }
+
+    function quickWithdrawAll() {
+      document.getElementById('withdrawAmount').value = cashBalance.toFixed(2);
+    }
+
+    function processWithdraw() {
+      const input = document.getElementById('withdrawAmount');
+      const amount = parseFloat(input.value);
+
+      if (!amount || amount <= 0) {
+        showToast('Please enter a valid withdrawal amount', 'error');
+        return;
+      }
+
+      if (amount > cashBalance) {
+        showToast('Amount exceeds available cash balance', 'error');
+        return;
+      }
+
+      // Process withdrawal
+      cashBalance -= amount;
+      saveState();
+      updateBalanceDisplay();
+      updateWithdrawAvailable();
+
+      // Success
+      showToast(`Withdrawal of ${formatRands(amount)} processed successfully!`, 'success');
+
+      // Clear input
+      input.value = '';
+
+      // Add to activity (simple)
+      addTransaction(`Withdrawal`, amount, 'out');
+    }
+
+    function addTransaction(type, amount, direction) {
+      let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+      transactions.unshift({
+        type,
+        amount,
+        direction,
+        date: new Date().toISOString()
+      });
+      localStorage.setItem('transactions', JSON.stringify(transactions.slice(0, 10))); // keep last 10
+    }
+
+    // ==================== PROFILE ====================
+    function loadProfile() {
+      const first = localStorage.getItem('userFirstName') || 'Demo';
+      const last = localStorage.getItem('userLastName') || 'User';
+      const email = localStorage.getItem('userEmail') || 'demo@aethertrade.co.za';
+
+      document.getElementById('profileFullName').textContent = `${first} ${last}`;
+      document.getElementById('profileEmail').textContent = email;
+
+      // Joined date
+      const joined = new Date();
+      joined.setDate(joined.getDate() - Math.floor(Math.random() * 45) - 5);
+      document.getElementById('profileJoined').textContent = joined.toLocaleDateString('en-ZA', { 
+        month: 'long', year: 'numeric' 
+      });
+    }
+
+    function logout() {
+      if (confirm('Sign out of this demo account?')) {
+        localStorage.removeItem('loggedIn');
+        window.location.href = 'auth.html';
+      }
+    }
+
+    // ==================== NAVIGATION ====================
+    function showSection(section) {
+      // Hide all sections
+      document.querySelectorAll('.section').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+
+      // Show target
+      const target = document.getElementById(section + '-section');
+      if (target) {
+        target.classList.remove('hidden');
+        target.classList.add('active');
+      }
+
+      // Update nav active states (desktop)
+      document.querySelectorAll('[id^="nav-"]').forEach(el => el.classList.remove('nav-active', 'bg-slate-800'));
+      const navEl = document.getElementById('nav-' + section);
+      if (navEl) navEl.classList.add('nav-active', 'bg-slate-800');
+
+      // Mobile bottom nav active
+      document.querySelectorAll('[id^="bottom-"]').forEach(el => el.classList.remove('text-emerald-400'));
+      const bottomEl = document.getElementById('bottom-' + section);
+      if (bottomEl) bottomEl.classList.add('text-emerald-400');
+
+      // Special renders
+      if (section === 'portfolio') {
+        renderPortfolio();
+      }
+      if (section === 'withdraw') {
+        updateWithdrawAvailable();
+      }
+      if (section === 'profile') {
+        loadProfile();
+      }
+    }
+
+    // ==================== PERSISTENCE ====================
+    function saveState() {
+      localStorage.setItem('cashBalance', cashBalance);
+      localStorage.setItem('portfolio', JSON.stringify(portfolio));
+    }
+
+    function loadState() {
+      const savedCash = localStorage.getItem('cashBalance');
+      if (savedCash) cashBalance = parseFloat(savedCash);
+
+      const savedPortfolio = localStorage.getItem('portfolio');
+      if (savedPortfolio) portfolio = JSON.parse(savedPortfolio);
+    }
+
+    // ==================== INITIALIZATION ====================
+    function initializeDashboard() {
+      // === AUTH GATE: Redirect if not logged in ===
+      if (!localStorage.getItem('userEmail') || localStorage.getItem('loggedIn') !== 'true') {
+        window.location.href = 'auth.html';
+        return;
+      }
+
+      // Load user name
+      const firstName = localStorage.getItem('userFirstName') || localStorage.getItem('userName') || 'Investor';
+      document.getElementById('userNameDisplay').textContent = firstName;
+      const mobileName = document.getElementById('userNameDisplayMobile');
+      if (mobileName) mobileName.textContent = firstName;
+
+      // Load previous state or start fresh
+      loadState();
+
+      // If first time, give starter cash
+      if (!localStorage.getItem('cashBalance')) {
+        cashBalance = 5000;
+        portfolio = [];
+        saveState();
+      }
+
+      // Render everything
+      renderTicker();
+      renderInvestmentCards();
+      updateBalanceDisplay();
+      updateWithdrawAvailable();
+
+      // Start live price updates
+      setInterval(() => {
+        updateLivePrices();
+      }, 4200);
+
+      // Show markets by default
+      showSection('markets');
+
+      // Keyboard support for search
+      const search = document.getElementById('searchInput');
+      if (search) {
+        search.addEventListener('focus', () => {
+          if (!document.getElementById('markets-section').classList.contains('active')) {
+            showSection('markets');
+          }
+        });
+      }
+
+      // Welcome toast for new users
+      if (!localStorage.getItem('hasSeenWelcome')) {
+        setTimeout(() => {
+          showToast('Welcome! Your demo account is ready with R5,000.', 'success');
+          localStorage.setItem('hasSeenWelcome', 'true');
+        }, 1200);
+      }
+
+      // If profit was previously triggered, make sure flag is set
+      if (localStorage.getItem('profitTriggered') === 'done') {
+        // already done
+      }
+    }
+
+    // Boot everything
+    window.onload = initializeDashboard;
+  </script>
+</body>
+</html>

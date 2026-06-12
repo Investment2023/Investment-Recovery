@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login • AetherTrade</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .input-focus { transition: all 0.2s ease; }
+    .input-focus:focus { border-color: #10b981; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1); }
+    .auth-tab {
+      transition: all 0.2s ease;
+    }
+    .auth-tab.active {
+      background-color: #10b981;
+      color: white;
+      border-color: #10b981;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-200 min-h-screen flex items-center justify-center p-6">
+  <div class="max-w-md w-full">
+    <!-- Logo -->
+    <div class="flex items-center gap-3 mb-8 justify-center">
+      <div class="w-10 h-10 bg-emerald-500 rounded-2xl flex items-center justify-center">
+        <i class="fa-solid fa-shield-halved text-white text-2xl"></i>
+      </div>
+      <span class="text-3xl font-semibold tracking-tighter">AetherTrade</span>
+    </div>
+
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl p-8 shadow-2xl">
+      
+      <!-- Dynamic Header -->
+      <div id="authHeader">
+        <h1 class="text-3xl font-semibold mb-2" id="authTitle">Welcome back</h1>
+        <p class="text-slate-400 mb-8" id="authSubtitle">Sign in to access your portfolio</p>
+      </div>
+
+      <!-- Login Form -->
+      <form id="loginForm" class="space-y-5 hidden">
+        <div>
+          <label class="block text-sm font-medium mb-2 text-slate-300">Email Address</label>
+          <input type="email" id="loginEmail" required 
+                 class="input-focus w-full bg-slate-800 border border-slate-600 focus:border-emerald-500 rounded-2xl px-5 py-3.5 outline-none text-white">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-2 text-slate-300">Password</label>
+          <input type="password" id="loginPassword" required placeholder="Enter your password"
+                 class="input-focus w-full bg-slate-800 border border-slate-600 focus:border-emerald-500 rounded-2xl px-5 py-3.5 outline-none text-white">
+        </div>
+
+        <div class="pt-2">
+          <button type="submit"
+                  class="w-full bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-semibold py-4 rounded-2xl text-lg transition-all flex items-center justify-center gap-2">
+            <span>Sign In to Dashboard</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+
+        <div class="text-center">
+          <button type="button" onclick="switchToRegister()" 
+                  class="text-emerald-400 hover:text-emerald-300 text-sm font-medium transition">
+            Don't have an account? Create one
+          </button>
+        </div>
+      </form>
+
+      <!-- Register Form -->
+      <form id="registerForm" class="space-y-5">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium mb-2 text-slate-300">First Name</label>
+            <input type="text" id="firstName" required placeholder="Thabo"
+                   class="input-focus w-full bg-slate-800 border border-slate-600 focus:border-emerald-500 rounded-2xl px-5 py-3.5 outline-none text-white">
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-2 text-slate-300">Last Name</label>
+            <input type="text" id="lastName" required placeholder="Dlamini"
+                   class="input-focus w-full bg-slate-800 border border-slate-600 focus:border-emerald-500 rounded-2xl px-5 py-3.5 outline-none text-white">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-2 text-slate-300">Email Address</label>
+          <input type="email" id="email" required placeholder="you@email.com"
+                 class="input-focus w-full bg-slate-800 border border-slate-600 focus:border-emerald-500 rounded-2xl px-5 py-3.5 outline-none text-white">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-2 text-slate-300">Password</label>
+          <input type="password" id="password" required minlength="6" placeholder="Create a secure password"
+                 class="input-focus w-full bg-slate-800 border border-slate-600 focus:border-emerald-500 rounded-2xl px-5 py-3.5 outline-none text-white">
+        </div>
+
+        <div class="pt-2">
+          <button type="submit"
+                  class="w-full bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-semibold py-4 rounded-2xl text-lg transition-all flex items-center justify-center gap-2">
+            <span>Create Free Demo Account</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+
+        <div class="text-center">
+          <button type="button" onclick="switchToLogin()" 
+                  class="text-emerald-400 hover:text-emerald-300 text-sm font-medium transition">
+            Already have an account? Sign in
+          </button>
+        </div>
+      </form>
+
+      <div class="mt-6 text-center">
+        <p class="text-xs text-slate-500">This is a simulation only — no real funds or trading occurs.<br>Demo data is stored in your browser.</p>
+      </div>
+    </div>
+
+    <div class="flex justify-center mt-6 text-xs text-slate-500 items-center gap-2">
+      <i class="fa-solid fa-lock"></i>
+      <span>256-bit encrypted • Secure demo environment</span>
+    </div>
+  </div>
+
+  <script>
+    // Check if user already exists
+    function checkExistingUser() {
+      const hasUser = localStorage.getItem('userEmail');
+      const isLoggedIn = localStorage.getItem('loggedIn') === 'true';
+
+      if (hasUser && isLoggedIn) {
+        // Already logged in → go straight to dashboard
+        window.location.href = 'dashboard.html';
+        return;
+      }
+
+      if (hasUser) {
+        // User exists but not logged in → show login form
+        showLoginForm();
+      } else {
+        // No user → show register form
+        showRegisterForm();
+      }
+    }
+
+    function showLoginForm() {
+      document.getElementById('registerForm').classList.add('hidden');
+      document.getElementById('loginForm').classList.remove('hidden');
+      
+      document.getElementById('authTitle').textContent = 'Welcome back';
+      document.getElementById('authSubtitle').textContent = 'Sign in to access your portfolio and investments';
+      
+      // Prefill email
+      const savedEmail = localStorage.getItem('userEmail');
+      if (savedEmail) {
+        document.getElementById('loginEmail').value = savedEmail;
+      }
+    }
+
+    function showRegisterForm() {
+      document.getElementById('loginForm').classList.add('hidden');
+      document.getElementById('registerForm').classList.remove('hidden');
+      
+      document.getElementById('authTitle').textContent = 'Create your demo account';
+      document.getElementById('authSubtitle').textContent = 'Start with R5,000 virtual capital. No real money required.';
+    }
+
+    function switchToLogin() {
+      showLoginForm();
+    }
+
+    function switchToRegister() {
+      showRegisterForm();
+    }
+
+    // Login handler
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      
+      const savedEmail = localStorage.getItem('userEmail');
+      const savedPassword = localStorage.getItem('userPassword');
+      
+      if (email === savedEmail && password === savedPassword) {
+        localStorage.setItem('loggedIn', 'true');
+        window.location.href = 'dashboard.html';
+      } else {
+        alert('Invalid email or password. Please try again.');
+        // For demo: show hint
+        const hint = document.createElement('p');
+        hint.className = 'text-xs text-red-400 mt-2 text-center';
+        hint.textContent = 'Demo hint: Use the password you created during registration';
+        const form = document.getElementById('loginForm');
+        if (!form.querySelector('.text-red-400')) {
+          form.appendChild(hint);
+          setTimeout(() => hint.remove(), 4000);
+        }
+      }
+    });
+
+    // Register handler
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const firstName = document.getElementById('firstName').value.trim() || "Demo";
+      const lastName = document.getElementById('lastName').value.trim() || "User";
+      const email = document.getElementById('email').value.trim() || "demo@aethertrade.co.za";
+      const password = document.getElementById('password').value;
+      
+      // Save user credentials
+      localStorage.setItem('userFirstName', firstName);
+      localStorage.setItem('userLastName', lastName);
+      localStorage.setItem('userEmail', email);
+      localStorage.setItem('userPassword', password);
+      localStorage.setItem('userName', firstName);
+      
+      // Initialize fresh demo data
+      localStorage.removeItem('cashBalance');
+      localStorage.removeItem('portfolio');
+      localStorage.removeItem('profitTriggered');
+      localStorage.removeItem('transactions');
+      localStorage.removeItem('hasSeenWelcome');
+      
+      // Set as logged in
+      localStorage.setItem('loggedIn', 'true');
+      
+      // Go to dashboard
+      window.location.href = 'dashboard.html';
+    });
+
+    // Initialize on load
+    window.onload = function() {
+      checkExistingUser();
+    };
+  </script>
+</body>
+</html>
